@@ -1,5 +1,3 @@
-
-
 import org.json.JSONObject;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -7,10 +5,10 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static Pokemon getPokemonData(String name) {
+    public static Pokemon getCardData(String name) {
         try {
             // URL für die API
-            URL url = new URL("https://pokeapi.co/api/v2/pokemon/" + name);
+            URL url = new URL("https://api.pokemontcg.io/v2/cards?q=name:" + name);
 
             // Verbindung öffnen
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -35,13 +33,41 @@ public class Main {
             // JSON in JSONObject umwandeln
             JSONObject jsonObj = new JSONObject(jsonStr.toString());
 
-            // Pokémon-Name und -Typ extrahieren
-            String pokemonName = jsonObj.getString("name");
-            String pokemonType = jsonObj.getJSONArray("types").getJSONObject(0).getJSONObject("type").getString("name");
+            // Wir gehen davon aus, dass der Name immer existiert, wenn das Pokémon gefunden wird
+            String pokemonName = jsonObj.getJSONArray("data")
+                                        .getJSONObject(0)
+                                        .getString("name");
 
+            // Set, Seltenheit und Preis extrahieren
+            String pokemonSet = jsonObj.getJSONArray("data")
+                                       .getJSONObject(0)
+                                       .getJSONObject("set")
+                                       .getString("name");
+
+            String rarity = jsonObj.getJSONArray("data")
+                                   .getJSONObject(0)
+                                   .getString("rarity");
+
+            // Preis (in USD) extrahieren (Preis ist nicht immer vorhanden, deshalb prüfen)
+            String price = "Nicht verfügbar"; // Standardwert, falls Preis nicht vorhanden
+            try {
+                price = jsonObj.getJSONArray("data")
+                               .getJSONObject(0)
+                               .getJSONArray("card_prices")
+                               .getJSONObject(0)
+                               .getString("usd");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // Bild-URL extrahieren
+            String imageUrl = jsonObj.getJSONArray("data")
+                                     .getJSONObject(0)
+                                     .getJSONObject("images")
+                                     .getString("small");
 
             // Rückgabe eines Pokémon-Objekts
-            return new Pokemon(pokemonName, pokemonType);
+            return new Pokemon(pokemonName, pokemonSet, rarity, price, imageUrl);
 
         } catch (Exception e) {
             e.printStackTrace();
