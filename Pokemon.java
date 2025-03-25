@@ -7,7 +7,7 @@ public class Pokemon {
 	    private String price;
 	    private String imageUrl;
 
-	    // Konstruktor
+	    // Constructor
 	    public Pokemon(String name, String set, String rarity, String price, String imageUrl) {
 	        this.name = name;
 	        this.set = set;
@@ -16,7 +16,7 @@ public class Pokemon {
 	        this.imageUrl=imageUrl;
 	    }
 
-	    // Getter Methoden
+	    // Getter Method
 	    public String getName() {
 	        return name;
 	    }
